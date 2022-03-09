@@ -1,0 +1,10 @@
+"STARTUP.obj",
+"main.obj",
+".\delay.obj",
+".\uart.obj",
+".\spi.obj",
+".\oled.obj",
+".\RF24L01.obj" 
+TO "rf24l01_51" 
+
+PRINT(".\Listings\rf24l01_51.map") REMOVEUNUSED 
