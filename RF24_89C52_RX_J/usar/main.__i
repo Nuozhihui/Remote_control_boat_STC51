@@ -1,0 +1,1 @@
+"main.c" LARGE OMF2 OPTIMIZE (8,SPEED) BROWSE INCDIR(..\Include;..\Include) DEBUG PRINT(.\Listings\main.lst) TABS (2)

@@ -25,9 +25,10 @@
 
 */
 #include "main.h"
-
+sbit LED1=P
 const char *content = "yunguokeji";
 u8   UART_BUFFER[64]={0},RF24L01RxBuffer[64]={0};
+sbit BEEP=P2^3;
 void main()
 {
 	u8 j;
@@ -71,5 +72,26 @@ void main()
 			num++;
 	        if(num==8)  num=0;
 		}
+			
+		switch(RF24L01RxBuffer[0])
+		{
+			case 1:	//Ç°½ø
+				
+			break;
+			
+			case 2:	//×ó×ª
+				
+			break;
+			
+			case 3:	//ÓÒ
+				
+			break;
+			
+		}
+			
+			
+	}
+		
+		
 	}
 }

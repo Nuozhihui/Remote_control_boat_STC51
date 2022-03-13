@@ -26,7 +26,9 @@
 */
 #include "main.h"
 
-const char *content = "yunguokeji";
+sbit S2=P3^0;
+sbit S3=P3^1;
+const char *content = "wujinchang";
 u8   UART_BUFFER[64]={0},RF24L01RxBuffer[64]={0};
 void main()
 {
@@ -58,13 +60,28 @@ void main()
 	OLED_ShowCHinese(96,0,11);   //公
 	OLED_ShowCHinese(112,0,12);  //司
 	//****************发送********************************************//
+	 RF24L01_Set_Mode( MODE_TX );		//发送模式
 	while(1)
 	{
-		 RF24L01_Set_Mode( MODE_TX );		//发送模式
-		 NRF24L01_TxPacket( content, 10 );		//模式1发送固定字符,1S一包
-//		 NRF24L01_TxPacket( UART_BUFFER, 10 );		//模式1发送固定字符,1S一包
-		 num++;
-		 OLED_ShowNum(90,3,num,3,16);
-		 delay_ms( 1000 );
+		if(S2==0)
+		{
+		
+		 NRF24L01_TxPacket(0, 12 );		//模式1发送固定字符,1S一包
+			
+			while(!S2);
+		}
+		
+		if(S3==0)
+		{
+		 
+		 NRF24L01_TxPacket(1, 2 );		//模式1发送固定字符,1S一包
+			while(!S3);
+		}
+		
+
+////		 NRF24L01_TxPacket( UART_BUFFER, 10 );		//模式1发送固定字符,1S一包
+//		 num++;
+//		 OLED_ShowNum(90,3,num,3,16);
+		 delay_ms( 5 );
 	}
 }

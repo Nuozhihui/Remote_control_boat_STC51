@@ -1,0 +1,1 @@
+"..\Common\oled.c" LARGE OMF2 OPTIMIZE (8,SPEED) BROWSE INCDIR(..\Include) DEBUG PRINT(.\Listings\oled.lst) TABS (2) OBJECT(.\oled.obj)

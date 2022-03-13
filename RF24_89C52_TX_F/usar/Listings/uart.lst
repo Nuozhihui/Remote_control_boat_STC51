@@ -1,10 +1,10 @@
-C51 COMPILER V9.54   UART                                                                  08/10/2018 11:14:59 PAGE 1   
+C51 COMPILER V9.60.0.0   UART                                                              03/11/2022 10:38:07 PAGE 1   
 
 
-C51 COMPILER V9.54, COMPILATION OF MODULE UART
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE UART
 OBJECT MODULE PLACED IN .\uart.obj
-COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\Common\uart.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Include) 
-                    -DEBUG PRINT(.\Listings\uart.lst) OBJECT(.\uart.obj)
+COMPILER INVOKED BY: D:\Code\ARM\C51\BIN\C51.EXE ..\Common\uart.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Include)
+                    - DEBUG PRINT(.\Listings\uart.lst) TABS(2) OBJECT(.\uart.obj)
 
 line level    source
 
@@ -13,24 +13,24 @@ line level    source
    3              GT-24 V1.0 (RF24L01) 测试开发程序
    4          
    5              编者：果云科技有限公司
-   6                  淘宝店铺:https://shop532831232.taobao.com
-   7                  
-   8                  适用芯片：89C52
-   9                  
-  10                  线路连接：  RF24L01： VCC        3.3V
-  11                                                       GND        GND
-  12                                                            CE        P1^0
-  13                                                           IRQ        P1^5
+   6            淘宝店铺:https://shop532831232.taobao.com
+   7            
+   8            适用芯片：89C52
+   9            
+  10            线路连接：  RF24L01： VCC        3.3V
+  11                         GND        GND
+  12                        CE        P1^0
+  13                       IRQ        P1^5
   14                                   CSN        P1^3
-  15                                                       SCK        P1^1
-  16                                                          MOSI        P1^4
-  17                                                          MISO        P1^2
-  18                                                          
-  19                              OLED(IIC):  VCC        3.3V
-  20                                                  GND        GND
-  21                                                          SCL        P1^6
-  22                                                          SDA        P1^7
-  23                                                          
+  15                         SCK        P1^1
+  16                      MOSI        P1^4
+  17                      MISO        P1^2
+  18                      
+  19                  OLED(IIC):  VCC        3.3V
+  20                          GND        GND
+  21                      SCL        P1^6
+  22                      SDA        P1^7
+  23                      
   24              最后修改时间；2018年8月1日 12:00:00
   25          
   26          */
@@ -44,75 +44,75 @@ line level    source
   34            */
   35          void drv_uart_init( )
   36          {
-  37   1              //引脚配置 部分51单片机不需要
-  38   1              //TX配置为输出 RX配置为输入
-  39   1              UART_TX_PxM0 |= IO_OUT_PUT_PP_M0 << UART_TX_PIN_BIT;
-  40   1              UART_TX_PxM1 |= IO_OUT_PUT_PP_M1 << UART_TX_PIN_BIT;
-  41   1              UART_RX_PxM0 |= IO_IN_PUT_ONLY_M0 << UART_RX_PIN_BIT;
-  42   1              UART_RX_PxM1 |= IO_IN_PUT_ONLY_M1 << UART_RX_PIN_BIT;
-  43   1              UART_TX = 1;
-  44   1              
-  45   1              //串口配置
-  46   1              SCON &= (uint8_t)((uint8_t)( ~( UART_MODE | UART_RX )));        //清SM0 SM1 REN
-  47   1              SCON |= (uint8_t)( UART_8BAUDRATE_VOLATILE | UART_RX );
-  48   1              
-  49   1              //TIM1配置
-  50   1              TMOD &= (uint8_t)((uint8_t)( ~TIM1_MODE ));
-  51   1              TMOD |= TIM1_MODE_2;    //8位自动重装
-  52   1              PCON = 0x00;
-  53   1              TH1 = 0xFD;                             //波特率默认配置为9600
-  54   1              TL1 = 0xFD;
-C51 COMPILER V9.54   UART                                                                  08/10/2018 11:14:59 PAGE 2   
+  37   1        //引脚配置 部分51单片机不需要
+  38   1        //TX配置为输出 RX配置为输入
+  39   1        UART_TX_PxM0 |= IO_OUT_PUT_PP_M0 << UART_TX_PIN_BIT;
+  40   1        UART_TX_PxM1 |= IO_OUT_PUT_PP_M1 << UART_TX_PIN_BIT;
+  41   1        UART_RX_PxM0 |= IO_IN_PUT_ONLY_M0 << UART_RX_PIN_BIT;
+  42   1        UART_RX_PxM1 |= IO_IN_PUT_ONLY_M1 << UART_RX_PIN_BIT;
+  43   1        UART_TX = 1;
+  44   1        
+  45   1        //串口配置
+  46   1        SCON &= (uint8_t)((uint8_t)( ~( UART_MODE | UART_RX )));  //清SM0 SM1 REN
+  47   1        SCON |= (uint8_t)( UART_8BAUDRATE_VOLATILE | UART_RX );
+  48   1        
+  49   1        //TIM1配置
+  50   1        TMOD &= (uint8_t)((uint8_t)( ~TIM1_MODE ));
+  51   1        TMOD |= TIM1_MODE_2;  //8位自动重装
+  52   1        PCON = 0x00;
+  53   1        TH1 = 0xFD;       //波特率默认配置为9600
+  54   1        TL1 = 0xFD;
+C51 COMPILER V9.60.0.0   UART                                                              03/11/2022 10:38:07 PAGE 2   
 
-  55   1              
-  56   1              TI = 1;                                 //清发送标志                                            
-  57   1              TR1 = 1;                                //使能定时器
+  55   1        
+  56   1        TI = 1;         //清发送标志            
+  57   1        TR1 = 1;        //使能定时器
   58   1      }
   59          
   60          /**
   61            * @brief :串口发送数据
   62            * @param :
-  63            *                     @TxBuffer:发送数据首地址
-  64            *                     @Length:数据长度
+  63            *     @TxBuffer:发送数据首地址
+  64            *     @Length:数据长度
   65            * @note  :无
   66            * @retval:无
   67            */
   68          void drv_uart_tx_bytes( uint8_t* TxBuffer, uint8_t Length )
   69          {
-  70   1              while( Length-- )
-  71   1              {
-  72   2                      while( 0 == TI );               //等待上次发送完成
-  73   2                      TI = 0;                                 //清标志位
-  74   2                      SBUF = *TxBuffer;               //发送数据
-  75   2                      TxBuffer++;
-  76   2              }
+  70   1        while( Length-- )
+  71   1        {
+  72   2          while( 0 == TI );   //等待上次发送完成
+  73   2          TI = 0;         //清标志位
+  74   2          SBUF = *TxBuffer;   //发送数据
+  75   2          TxBuffer++;
+  76   2        }
   77   1      }
   78          
   79          /**
   80            * @brief :串口接收数据
   81            * @param :
-  82            *                     @RxBuffer:发送数据首地址
+  82            *     @RxBuffer:发送数据首地址
   83            * @note  :无
   84            * @retval:接收到的字节个数
   85            */
   86          uint8_t drv_uart_rx_bytes( uint8_t* RxBuffer )
   87          {
-  88   1              uint8_t l_RxLength = 0;
-  89   1              uint16_t l_UartRxTimOut = 0x7FFF;
-  90   1              
-  91   1              while( l_UartRxTimOut-- )               //在超时范围内检测数据
-  92   1              {
-  93   2                      if( 0 != RI )                           //检测是否接收到数据
-  94   2                      {
-  95   3                              RI = 0;                                 //清标志位              
-  96   3                              *RxBuffer = SBUF;               //读数据
-  97   3                              RxBuffer++;
-  98   3                              l_RxLength++;
-  99   3                              l_UartRxTimOut = 0x7FFF;//重置超时检测
- 100   3                      }
- 101   2              }
- 102   1              
- 103   1              return l_RxLength;                      //等待超时，数据接收完成
+  88   1        uint8_t l_RxLength = 0;
+  89   1        uint16_t l_UartRxTimOut = 0x7FFF;
+  90   1        
+  91   1        while( l_UartRxTimOut-- )   //在超时范围内检测数据
+  92   1        {
+  93   2          if( 0 != RI )       //检测是否接收到数据
+  94   2          {
+  95   3            RI = 0;         //清标志位    
+  96   3            *RxBuffer = SBUF;   //读数据
+  97   3            RxBuffer++;
+  98   3            l_RxLength++;
+  99   3            l_UartRxTimOut = 0x7FFF;//重置超时检测
+ 100   3          }
+ 101   2        }
+ 102   1        
+ 103   1        return l_RxLength;      //等待超时，数据接收完成
  104   1      }
  105          
 
@@ -126,7 +126,7 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
    EDATA SIZE       =   ----    ----
-C51 COMPILER V9.54   UART                                                                  08/10/2018 11:14:59 PAGE 3   
+C51 COMPILER V9.60.0.0   UART                                                              03/11/2022 10:38:07 PAGE 3   
 
    HDATA SIZE       =   ----    ----
    XDATA CONST SIZE =   ----    ----
