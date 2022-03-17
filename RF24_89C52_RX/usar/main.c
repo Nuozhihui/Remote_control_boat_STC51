@@ -45,7 +45,23 @@ void timer0() interrupt 1
 	pwm_t++;
 	if(pwm_t == 255)
 	{
-		 F_Date();
+		 	if(MOD==1)		//前
+	{
+		AIN1 = 0;
+		BIN1 = 0;
+	}else if(MOD==2){
+		
+		AIN1 = 1;
+		BIN1 = 1;
+	}else if(MOD==3){
+		
+		AIN1 = 1;
+		BIN1 = 0;
+	}else if(MOD==4){
+		
+		AIN1 = 0;
+		BIN1 = 1;
+	}
 	}
 	if(pwm_motor_val == pwm_t)
 	{	
@@ -59,7 +75,7 @@ void main()
 	u8 j;
 	u32 num=0;
 	OLED_Init();			   //初始化OLED  
-    OLED_Clear();
+  OLED_Clear();
 	
 	drv_spi_init( );           //SPI初始化
 	
@@ -91,7 +107,7 @@ void main()
 	//********************************接收*************************************//
 	while(1)
 	{
-//		
+	
 		 j = NRF24L01_RxPacket( RF24L01RxBuffer );		//接收字节
 	
 		if( 0 != j )
@@ -103,27 +119,33 @@ void main()
 		if( RF24L01RxBuffer[1]==0)
 			{
 				MOD=2;
-				BEEP=0;
+			TR0 = 0;//启动定时器0
+				AIN1 = 1;
+				BIN1 = 1;
 				
 				pwm_motor_val=255;
 			}else if( RF24L01RxBuffer[1]==1)
 			{
+				TR0 = 1;//启动定时器0
 				MOD=1;
 				BEEP=0;
 				
 				pwm_motor_val=200;
 			}else if( RF24L01RxBuffer[1]==2)
 			{
+				TR0 = 1;//启动定时器0
 				MOD=2;
 				BEEP=1;
 					pwm_motor_val=255;
 			}else if( RF24L01RxBuffer[1]==3)
 			{
+				TR0 = 1;//启动定时器0
 				MOD=3;
 				BEEP=0;
 				pwm_motor_val=200;
 			}else if( RF24L01RxBuffer[1]==4)
 			{
+				TR0 = 1;//启动定时器0
 				MOD=4;
 				BEEP=1;
 				pwm_motor_val=200;

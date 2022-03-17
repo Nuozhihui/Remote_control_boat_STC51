@@ -46,9 +46,7 @@ void main()
 					OLED_Clear();  
 					OLED_ShowString(10,10,"advance",4);
 				}
-		}
-		
-		if( KEY2==0)
+		}else if( KEY2==0)
 		{
 			 delay_ms( 5);
 			 if( KEY2==0)
@@ -59,9 +57,7 @@ void main()
 					OLED_ShowString(10,10,"Stop",4);
 					
 				}
-		}
-		
-		if( KEY3==0)
+		}else if( KEY3==0)
 		{
 			 delay_ms( 5);
 			 if( KEY3==0)
@@ -71,9 +67,7 @@ void main()
 					OLED_Clear();  
 					OLED_ShowString(10,10,"left",4);
 				}
-		}
-		
-		if( KEY4==0)
+		}else if( KEY4==0)
 		{
 			 delay_ms( 5);
 			 if( KEY4==0)
@@ -83,6 +77,9 @@ void main()
 					OLED_Clear();  
 					OLED_ShowString(10,10,"right",4);
 				}
+		}else{
+			 TxBuf[1] = 0 ;
+					 NRF24L01_TxPacket(TxBuf, 2 );		//模式1发送固定字符,1S一包
 		}
 		TxBuf[1] = 0x00;
 		TxBuf[2] = 0x00;
