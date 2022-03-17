@@ -1,0 +1,155 @@
+C51 COMPILER V9.60.0.0   SPI                                                               03/15/2022 22:42:11 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE SPI
+OBJECT MODULE PLACED IN .\spi.obj
+COMPILER INVOKED BY: D:\Code\ARM\C51\BIN\C51.EXE ..\Common\spi.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Include) 
+                    -DEBUG PRINT(.\Listings\spi.lst) TABS(2) OBJECT(.\spi.obj)
+
+line level    source
+
+   1          /*
+   2          
+   3              GT-24 V1.0 (RF24L01) 测试开发程序
+   4          
+   5              编者：果云科技有限公司
+   6            淘宝店铺:https://shop532831232.taobao.com
+   7            
+   8            适用芯片：89C52
+   9            
+  10            线路连接：  RF24L01： VCC        3.3V
+  11                         GND        GND
+  12                        CE        P1^0
+  13                       IRQ        P1^5
+  14                                   CSN        P1^3
+  15                         SCK        P1^1
+  16                      MOSI        P1^4
+  17                      MISO        P1^2
+  18                      
+  19                  OLED(IIC):  VCC        3.3V
+  20                          GND        GND
+  21                      SCL        P1^6
+  22                      SDA        P1^7
+  23                      
+  24              最后修改时间；2018年8月1日 12:00:00
+  25          
+  26          */
+  27          #include "spi.h"
+  28          
+  29          /**
+  30            * @brief :SPI初始化(软件)
+  31            * @param :无
+  32            * @note  :无
+  33            * @retval:无
+  34            */
+  35          void drv_spi_init( void )
+  36          {
+  37   1        //引脚配置 部分51单片机不需要
+  38   1        //SCK MOSI NSS 配置为推挽输出
+  39   1        SPI_SCK_PxM0 = IO_OUT_PUT_PP_M0 << SPI_SCK_PIN_BIT;
+  40   1        SPI_SCK_PxM1 = IO_OUT_PUT_PP_M1 << SPI_SCK_PIN_BIT;
+  41   1        
+  42   1        SPI_MOSI_PxM0 = IO_OUT_PUT_PP_M0 << SPI_MOSI_PIN_BIT;
+  43   1        SPI_MOSI_PxM1 = IO_OUT_PUT_PP_M1 << SPI_MOSI_PIN_BIT;
+  44   1        
+  45   1        SPI_NSS_PxM0 = IO_OUT_PUT_PP_M0 << SPI_NSS_PIN_BIT;
+  46   1        SPI_NSS_PxM1 = IO_OUT_PUT_PP_M1 << SPI_NSS_PIN_BIT;
+  47   1        
+  48   1        //MISO 配置为输入
+  49   1        SPI_MISO_PxM0 = IO_IN_PUT_ONLY_M0 << SPI_MISO_PIN_BIT;
+  50   1        SPI_MISO_PxM1 = IO_IN_PUT_ONLY_M1 << SPI_MISO_PIN_BIT;
+  51   1        
+  52   1        //时钟置低
+  53   1        SPI_SCK = 0;  
+  54   1        //MOSI MISO NSS置高
+C51 COMPILER V9.60.0.0   SPI                                                               03/15/2022 22:42:11 PAGE 2   
+
+  55   1        SPI_MOSI = 1;   
+  56   1        SPI_MISO = 1;
+  57   1        SPI_NSS = 1;  
+  58   1      }
+  59          
+  60          /**
+  61            * @brief :SPI收发一个字节
+  62            * @param :
+  63            *     @TxByte: 发送的数据字节
+  64            * @note  :非堵塞式，一旦等待超时，函数会自动退出
+  65            * @retval:接收到的字节
+  66            */
+  67          uint8_t drv_spi_read_write_byte( uint8_t TxByte )
+  68          {
+  69   1        uint8_t i = 0, Data = 0;
+  70   1        
+  71   1        spi_set_clk_low( );
+  72   1        
+  73   1        for( i = 0; i < 8; i++ )      //一个字节8byte需要循环8次
+  74   1        {
+  75   2          /** 发送 */
+  76   2          if( 0x80 == ( TxByte & 0x80 ))
+  77   2          {
+  78   3            spi_set_mosi_hight( );    //如果即将要发送的位为 1 则置高IO引脚
+  79   3          }
+  80   2          else
+  81   2          {
+  82   3            spi_set_mosi_low( );    //如果即将要发送的位为 0 则置低IO引脚
+  83   3          }
+  84   2          TxByte <<= 1;         //数据左移一位，先发送的是最高位
+  85   2          spi_set_clk_high( );      //时钟线置高
+  86   2          _nop_( );
+  87   2        
+  88   2          /** 接收 */
+  89   2          Data <<= 1;           //接收数据左移一位，先接收到的是最高位
+  90   2          if( 1 == spi_get_miso( ))
+  91   2          {
+  92   3            Data |= 0x01;       //如果接收时IO引脚为高则认为接收到 1
+  93   3          }
+  94   2          
+  95   2          spi_set_clk_low( );       //时钟线置低
+  96   2          _nop_( );
+  97   2        }
+  98   1        
+  99   1        return Data;    //返回接收到的字节
+ 100   1      }
+ 101          
+ 102          /**
+ 103            * @brief :SPI收发字符串
+ 104            * @param :
+ 105            *     @ReadBuffer: 接收数据缓冲区地址
+ 106            *     @WriteBuffer:发送字节缓冲区地址
+ 107            *     @Length:字节长度
+ 108            * @note  :非堵塞式，一旦等待超时，函数会自动退出
+ 109            * @retval:无
+ 110            */
+ 111          void drv_spi_read_write_string( uint8_t* ReadBuffer, uint8_t* WriteBuffer, uint16_t Length )
+ 112          {
+ 113   1        spi_set_nss_low( );     //片选拉低
+ 114   1        
+ 115   1        while( Length-- )
+ 116   1        {
+C51 COMPILER V9.60.0.0   SPI                                                               03/15/2022 22:42:11 PAGE 3   
+
+ 117   2          *ReadBuffer = drv_spi_read_write_byte( *WriteBuffer );    //收发数据
+ 118   2          ReadBuffer++;
+ 119   2          WriteBuffer++;      //读写地址加1
+ 120   2        }
+ 121   1        
+ 122   1        spi_set_nss_high( );    //片选拉高
+ 123   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    184    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       8
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

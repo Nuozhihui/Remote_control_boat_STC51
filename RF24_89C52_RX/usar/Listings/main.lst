@@ -1,0 +1,139 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              03/17/2022 21:27:13 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: D:\Code\ARM\C51\BIN\C51.EXE main.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Include;..\Include
+                    -) DEBUG PRINT(.\Listings\main.lst) TABS(2)
+
+line level    source
+
+   1          
+   2          #include "main.h"
+   3          
+   4          const char *content = "yunguokeji";
+   5          u8   UART_BUFFER[64]={0},RF24L01RxBuffer[64]={0};
+   6          
+   7          unsigned char pwm_motor_val =255;//左右电机占空比值 取值范围0-170，0最快
+   8          unsigned char pwm_t;//周期
+   9          
+  10          sbit BEEP=P2^3;
+  11          sbit PWMA = P0^0;//
+  12          sbit PWMB = P0^5;//
+  13          
+  14          sbit AIN1 = P0^1;//
+  15          sbit AIN2 = P0^2;//
+  16          sbit BIN1 = P0^3;
+  17          sbit BIN2 = P0^4;//
+  18          //定时器0中断
+  19          void timer0() interrupt 1
+  20          {
+  21   1        pwm_t++;
+  22   1        if(pwm_t == 255)
+  23   1        {
+  24   2          AIN1 = 0;
+  25   2          BIN1 = 0;
+  26   2        }
+  27   1        if(pwm_motor_val == pwm_t)
+  28   1        { 
+  29   2          AIN1 = 1;     
+  30   2          BIN1 = 1; 
+  31   2        }
+  32   1      }
+  33          
+  34          void main()
+  35          {
+  36   1        u8 j;
+  37   1        u32 num=0;
+  38   1        OLED_Init();         //初始化OLED  
+  39   1          OLED_Clear();
+  40   1        
+  41   1        drv_spi_init( );           //SPI初始化
+  42   1        
+  43   1        
+  44   1        NRF24L01_Gpio_Init( );    //RF24L01引脚初始化
+  45   1        
+  46   1      
+  47   1        NRF24L01_check( );      //检测nRF24L01
+  48   1        RF24L01_Init( );
+  49   1        RF24L01_Set_Mode( MODE_RX );    //接收模式
+  50   1        OLED_ShowCHinese(0,2,0);     //接
+  51   1      
+  52   1        
+  53   1        
+  54   1        
+C51 COMPILER V9.60.0.0   MAIN                                                              03/17/2022 21:27:13 PAGE 2   
+
+  55   1        TMOD |= 0x02;//8位自动重装模块
+  56   1        TH0 = 220;
+  57   1        TL0 = 220;//11.0592M晶振下占空比最大比值是256,输出100HZ
+  58   1        TR0 = 1;//启动定时器0
+  59   1        ET0 = 1;//允许定时器0中断
+  60   1        EA  = 1;//总中断允许
+  61   1        
+  62   1        AIN2 = 1;
+  63   1        BIN2 = 1;
+  64   1        
+  65   1        PWMA=0;
+  66   1        PWMB=0;
+  67   1      
+  68   1        //********************************接收*************************************//
+  69   1        while(1)
+  70   1        {
+  71   2      //    
+  72   2           j = NRF24L01_RxPacket( RF24L01RxBuffer );    //接收字节
+  73   2        
+  74   2          if( 0 != j )
+  75   2          {
+  76   3      //      OLED_Clear();
+  77   3      //      OLED_ShowString(0,num,RF24L01RxBuffer,8);   
+  78   3      //      num++;
+  79   3      //      if(num==8)  num=0;
+  80   3          
+  81   3            if( RF24L01RxBuffer[1]==1)
+  82   3            {
+  83   4              BEEP=0;
+  84   4              
+  85   4              pwm_motor_val=200;
+  86   4            }
+  87   3      
+  88   3            if( RF24L01RxBuffer[1]==2)
+  89   3            {
+  90   4              BEEP=1;
+  91   4                pwm_motor_val=255;
+  92   4            }
+  93   3            if( RF24L01RxBuffer[1]==3)
+  94   3            {
+  95   4              BEEP=0;
+  96   4              pwm_motor_val=200;
+  97   4            }
+  98   3            if( RF24L01RxBuffer[1]==4)
+  99   3            {
+ 100   4              BEEP=1;
+ 101   4              pwm_motor_val=255;
+ 102   4            }
+ 103   3        }
+ 104   2      //  
+ 105   2        
+ 106   2        }
+ 107   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    189    ----
+   CONSTANT SIZE    =     11    ----
+   XDATA SIZE       =    133       2
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.0.0   MAIN                                                              03/17/2022 21:27:13 PAGE 3   
+
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
