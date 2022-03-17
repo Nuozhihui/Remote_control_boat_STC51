@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   MAIN                                                              03/17/2022 21:27:13 PAGE 1   
+C51 COMPILER V9.60.0.0   MAIN                                                              03/17/2022 21:45:15 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
@@ -25,109 +25,143 @@ line level    source
   15          sbit AIN2 = P0^2;//
   16          sbit BIN1 = P0^3;
   17          sbit BIN2 = P0^4;//
-  18          //定时器0中断
-  19          void timer0() interrupt 1
-  20          {
-  21   1        pwm_t++;
-  22   1        if(pwm_t == 255)
+  18          
+  19          int MOD=2;    //1:前进  2:停止  3:左转  4:右转
+  20          void F_Date()
+  21          {
+  22   1        if(MOD==1)    //前
   23   1        {
   24   2          AIN1 = 0;
   25   2          BIN1 = 0;
-  26   2        }
-  27   1        if(pwm_motor_val == pwm_t)
-  28   1        { 
-  29   2          AIN1 = 1;     
-  30   2          BIN1 = 1; 
-  31   2        }
-  32   1      }
-  33          
-  34          void main()
-  35          {
-  36   1        u8 j;
-  37   1        u32 num=0;
-  38   1        OLED_Init();         //初始化OLED  
-  39   1          OLED_Clear();
-  40   1        
-  41   1        drv_spi_init( );           //SPI初始化
-  42   1        
-  43   1        
-  44   1        NRF24L01_Gpio_Init( );    //RF24L01引脚初始化
-  45   1        
-  46   1      
-  47   1        NRF24L01_check( );      //检测nRF24L01
-  48   1        RF24L01_Init( );
-  49   1        RF24L01_Set_Mode( MODE_RX );    //接收模式
-  50   1        OLED_ShowCHinese(0,2,0);     //接
-  51   1      
-  52   1        
-  53   1        
-  54   1        
-C51 COMPILER V9.60.0.0   MAIN                                                              03/17/2022 21:27:13 PAGE 2   
+  26   2        }else if(MOD==2){
+  27   2          
+  28   2          AIN1 = 1;
+  29   2          BIN1 = 1;
+  30   2        }else if(MOD==3){
+  31   2          
+  32   2          AIN1 = 1;
+  33   2          BIN1 = 0;
+  34   2        }else if(MOD==4){
+  35   2          
+  36   2          AIN1 = 0;
+  37   2          BIN1 = 1;
+  38   2        }
+  39   1        
+  40   1      }
+  41          
+  42          //定时器0中断
+  43          void timer0() interrupt 1
+  44          {
+  45   1        pwm_t++;
+  46   1        if(pwm_t == 255)
+  47   1        {
+  48   2           F_Date();
+  49   2        }
+  50   1        if(pwm_motor_val == pwm_t)
+  51   1        { 
+  52   2          AIN1 = 1;     
+  53   2          BIN1 = 1; 
+  54   2        }
+C51 COMPILER V9.60.0.0   MAIN                                                              03/17/2022 21:45:15 PAGE 2   
 
-  55   1        TMOD |= 0x02;//8位自动重装模块
-  56   1        TH0 = 220;
-  57   1        TL0 = 220;//11.0592M晶振下占空比最大比值是256,输出100HZ
-  58   1        TR0 = 1;//启动定时器0
-  59   1        ET0 = 1;//允许定时器0中断
-  60   1        EA  = 1;//总中断允许
-  61   1        
-  62   1        AIN2 = 1;
-  63   1        BIN2 = 1;
-  64   1        
-  65   1        PWMA=0;
-  66   1        PWMB=0;
-  67   1      
-  68   1        //********************************接收*************************************//
-  69   1        while(1)
-  70   1        {
-  71   2      //    
-  72   2           j = NRF24L01_RxPacket( RF24L01RxBuffer );    //接收字节
-  73   2        
-  74   2          if( 0 != j )
-  75   2          {
-  76   3      //      OLED_Clear();
-  77   3      //      OLED_ShowString(0,num,RF24L01RxBuffer,8);   
-  78   3      //      num++;
-  79   3      //      if(num==8)  num=0;
-  80   3          
-  81   3            if( RF24L01RxBuffer[1]==1)
-  82   3            {
-  83   4              BEEP=0;
-  84   4              
-  85   4              pwm_motor_val=200;
-  86   4            }
-  87   3      
-  88   3            if( RF24L01RxBuffer[1]==2)
-  89   3            {
-  90   4              BEEP=1;
-  91   4                pwm_motor_val=255;
-  92   4            }
-  93   3            if( RF24L01RxBuffer[1]==3)
-  94   3            {
-  95   4              BEEP=0;
-  96   4              pwm_motor_val=200;
-  97   4            }
-  98   3            if( RF24L01RxBuffer[1]==4)
-  99   3            {
- 100   4              BEEP=1;
- 101   4              pwm_motor_val=255;
- 102   4            }
- 103   3        }
- 104   2      //  
- 105   2        
- 106   2        }
- 107   1      }
+  55   1      }
+  56          
+  57          void main()
+  58          {
+  59   1        u8 j;
+  60   1        u32 num=0;
+  61   1        OLED_Init();         //初始化OLED  
+  62   1          OLED_Clear();
+  63   1        
+  64   1        drv_spi_init( );           //SPI初始化
+  65   1        
+  66   1        
+  67   1        NRF24L01_Gpio_Init( );    //RF24L01引脚初始化
+  68   1        
+  69   1      
+  70   1        NRF24L01_check( );      //检测nRF24L01
+  71   1        RF24L01_Init( );
+  72   1        RF24L01_Set_Mode( MODE_RX );    //接收模式
+  73   1        OLED_ShowCHinese(0,2,0);     //接
+  74   1      
+  75   1        
+  76   1        
+  77   1        
+  78   1        TMOD |= 0x02;//8位自动重装模块
+  79   1        TH0 = 220;
+  80   1        TL0 = 220;//11.0592M晶振下占空比最大比值是256,输出100HZ
+  81   1        TR0 = 1;//启动定时器0
+  82   1        ET0 = 1;//允许定时器0中断
+  83   1        EA  = 1;//总中断允许
+  84   1        
+  85   1        AIN2 = 1;
+  86   1        BIN2 = 1;
+  87   1        
+  88   1        PWMA=0;
+  89   1        PWMB=0;
+  90   1      
+  91   1        //********************************接收*************************************//
+  92   1        while(1)
+  93   1        {
+  94   2      //    
+  95   2           j = NRF24L01_RxPacket( RF24L01RxBuffer );    //接收字节
+  96   2        
+  97   2          if( 0 != j )
+  98   2          {
+  99   3      //      OLED_Clear();
+ 100   3      //      OLED_ShowString(0,num,RF24L01RxBuffer,8);   
+ 101   3      //      num++;
+ 102   3      //      if(num==8)  num=0;
+ 103   3          if( RF24L01RxBuffer[1]==0)
+ 104   3            {
+ 105   4              MOD=2;
+ 106   4              BEEP=0;
+ 107   4              
+ 108   4              pwm_motor_val=255;
+ 109   4            }else if( RF24L01RxBuffer[1]==1)
+ 110   3            {
+ 111   4              MOD=1;
+ 112   4              BEEP=0;
+ 113   4              
+ 114   4              pwm_motor_val=200;
+ 115   4            }else if( RF24L01RxBuffer[1]==2)
+ 116   3            {
+C51 COMPILER V9.60.0.0   MAIN                                                              03/17/2022 21:45:15 PAGE 3   
+
+ 117   4              MOD=2;
+ 118   4              BEEP=1;
+ 119   4                pwm_motor_val=255;
+ 120   4            }else if( RF24L01RxBuffer[1]==3)
+ 121   3            {
+ 122   4              MOD=3;
+ 123   4              BEEP=0;
+ 124   4              pwm_motor_val=200;
+ 125   4            }else if( RF24L01RxBuffer[1]==4)
+ 126   3            {
+ 127   4              MOD=4;
+ 128   4              BEEP=1;
+ 129   4              pwm_motor_val=200;
+ 130   4            }else{
+ 131   4              
+ 132   4              pwm_motor_val=255;
+ 133   4            }
+ 134   3        }else{
+ 135   3              
+ 136   3              pwm_motor_val=255;
+ 137   3            }
+ 138   2      //  
+ 139   2        
+ 140   2        }
+ 141   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    189    ----
+   CODE SIZE        =    295    ----
    CONSTANT SIZE    =     11    ----
-   XDATA SIZE       =    133       2
+   XDATA SIZE       =    135       2
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
-C51 COMPILER V9.60.0.0   MAIN                                                              03/17/2022 21:27:13 PAGE 3   
-
    BIT SIZE         =   ----    ----
    EDATA SIZE       =   ----    ----
    HDATA SIZE       =   ----    ----

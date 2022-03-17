@@ -15,14 +15,37 @@ sbit AIN1 = P0^1;//
 sbit AIN2 = P0^2;//
 sbit BIN1 = P0^3;
 sbit BIN2 = P0^4;//
+
+int MOD=2;		//1:前进  2:停止  3:左转  4:右转
+void F_Date()
+{
+	if(MOD==1)		//前
+	{
+		AIN1 = 0;
+		BIN1 = 0;
+	}else if(MOD==2){
+		
+		AIN1 = 1;
+		BIN1 = 1;
+	}else if(MOD==3){
+		
+		AIN1 = 1;
+		BIN1 = 0;
+	}else if(MOD==4){
+		
+		AIN1 = 0;
+		BIN1 = 1;
+	}
+	
+}
+
 //定时器0中断
 void timer0() interrupt 1
 {
 	pwm_t++;
 	if(pwm_t == 255)
 	{
-		AIN1 = 0;
-		BIN1 = 0;
+		 F_Date();
 	}
 	if(pwm_motor_val == pwm_t)
 	{	
@@ -77,30 +100,41 @@ void main()
 //			OLED_ShowString(0,num,RF24L01RxBuffer,8);		
 //			num++;
 //	    if(num==8)  num=0;
-		
-			if( RF24L01RxBuffer[1]==1)
+		if( RF24L01RxBuffer[1]==0)
 			{
+				MOD=2;
+				BEEP=0;
+				
+				pwm_motor_val=255;
+			}else if( RF24L01RxBuffer[1]==1)
+			{
+				MOD=1;
 				BEEP=0;
 				
 				pwm_motor_val=200;
-			}
-
-			if( RF24L01RxBuffer[1]==2)
+			}else if( RF24L01RxBuffer[1]==2)
 			{
+				MOD=2;
 				BEEP=1;
 					pwm_motor_val=255;
-			}
-			if( RF24L01RxBuffer[1]==3)
+			}else if( RF24L01RxBuffer[1]==3)
 			{
+				MOD=3;
 				BEEP=0;
 				pwm_motor_val=200;
-			}
-			if( RF24L01RxBuffer[1]==4)
+			}else if( RF24L01RxBuffer[1]==4)
 			{
+				MOD=4;
 				BEEP=1;
+				pwm_motor_val=200;
+			}else{
+				
 				pwm_motor_val=255;
 			}
-	}
+	}else{
+				
+				pwm_motor_val=255;
+			}
 //	
 	
 	}
